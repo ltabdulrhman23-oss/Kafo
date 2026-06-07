@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كفو للتوصيل السريع | النظام الشامل</title>
+    
+    <meta name="theme-color" content="#0B2B30">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png"> <meta name="description" content="منصة كفو الشاملة: توصيل للأفراد، لوحة تحكم للمتاجر، تتبع حي، واشتراكات شهرية في الفلوجة.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap">
+    <style>
+        :root {
+            --bg-primary: #FFFFFF;
+            --teal-dark: #0B2B30;
+            --teal-card: #124046;
+            --gold: #D4AF37;
+            --gold-light: #F3D573;
+            --white: #FFFFFF;
+            --text-dark: #0B2B30;
+            --text-light: #E8F0F2;
+            --shadow-sm: 0 4px 10px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px rgba(11, 43, 48, 0.15);
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-dark); overflow-x: hidden; }
+
+        /* شريط التبويبات (Navigation) */
+        nav {
+            background: var(--teal-dark);
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 10px 15px;
+            transition: 0.3s;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tab-btn.active {
+            color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        /* الصفحات (Tabs Content) */
+        .page-content { display: none; animation: fadeIn 0.5s; padding: 20px; }
+        .page-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* التصميم المشترك */
+        .section-title {
+            color: var(--teal-dark);
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .section-title::after {
+            content: ''; display: block; width: 60px; height: 4px; background: var(--gold); margin: 8px auto 0;
+        }
+
+        .box {
+            background: var(--white);
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(11, 43, 48, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .btn-primary, .submit-btn {
+            background: var(--gold);
+            color: var(--teal-dark);
+            padding: 12px 25px;
+            border-radius: var(--radius);
+            font-size: 1.1rem;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+        .input-group { position: relative; margin-bottom: 15px; }
+        .input-group i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--gold); }
+        input, select {
+            width: 100%; padding: 12px 12px 12px 40px; border: 2px solid rgba(11, 43, 48, 0.2);
+            border-radius: var(--radius); font-size: 1rem; font-weight: 600; outline: none; transition: 0.3s;
+        }
+        input:focus, select:focus { border-color: var(--teal-dark); box-shadow: 0 0 8px rgba(11, 43, 48, 0.1); }
+
+        /* شاشة التتبع (Tracking UI) */
+        .tracking-bar {
+            display: flex; justify-content: space-between; position: relative; margin: 40px 0;
+        }
+        .tracking-bar::before {
+            content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 4px;
+            background: #eee; z-index: 1;
+        }
+        .tracking-step {
+            position: relative; z-index: 2; text-align: center; width: 25%;
+        }
+        .step-icon {
+            width: 35px; height: 35px; background: #eee; color: #aaa; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.2rem;
+            transition: 0.5s; border: 3px solid var(--white);
+        }
+        .tracking-step.completed .step-icon { background: var(--gold); color: var(--teal-dark); }
+        .step-text { font-size: 0.85rem; font-weight: 700; color: #aaa; }
+        .tracking-step.completed .step-text { color: var(--teal-dark); }
+
+        /* لوحة المتاجر */
+        .dashboard-table {
+            width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; text-align: center;
+        }
+        .dashboard-table th, .dashboard-table td { border: 1px solid #eee; padding: 10px; }
+        .dashboard-table th { background: var(--teal-dark); color: var(--white); }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .bg-pending { background: #ffeeba; color: #856404; }
+        .bg-delivering { background: #b8daff; color: #004085; }
+
+        /* بطاقات الاشتراكات */
+        .sub-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .sub-card { background: var(--teal-card); color: var(--white); padding: 25px; border-radius: var(--radius); text-align: center; position: relative; overflow: hidden; }
+        .sub-card h3 { color: var(--gold); margin-bottom: 10px; }
+        .sub-card ul { list-style: none; margin: 15px 0; text-align: right; font-size: 0.95rem; line-height: 1.8; }
+        .sub-card ul li::before { content: '✓'; color: var(--gold); margin-left: 8px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <button class="tab-btn active" onclick="openTab('home')"><i class="fas fa-home"></i> الرئيسية</button>
+        <button class="tab-btn" onclick="openTab('track')"><i class="fas fa-route"></i> تتبع الطلب</button>
+        <button class="tab-btn" onclick="openTab('merchants')"><i class="fas fa-store"></i> للمتاجر</button>
+        <button class="tab-btn" onclick="openTab('business')"><i class="fas fa-briefcase"></i> الاشتراكات</button>
+    </nav>
+
+    <div id="home" class="page-content active">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: var(--teal-dark); font-size: 2.5rem; font-weight: 900;">كفو</h1>
+            <p style="color: var(--gold); font-weight: 700;">أسرع دليفري بالفلوجة</p>
+        </div>
+
+        <div class="box">
+            <h2 class="section-title">طلب سريع للواتساب (أفراد)</h2>
+            <form onsubmit="sendSmartOrder(event)">
+                <div class="input-group"><i class="fas fa-shopping-bag"></i><input type="text" id="orderItem" placeholder="شنو طلبك؟" required></div>
+                <div class="input-group"><i class="fas fa-store"></i><input type="text" id="orderStore" placeholder="من يا مطعم أو سوگ؟" required></div>
+                <div class="input-group"><i class="fas fa-map-marker-alt"></i><input type="text" id="orderLocation" placeholder="عنوانك وين؟" required></div>
+                <button type="submit" class="submit-btn"><i class="fab fa-whatsapp"></i> إرسال الطلب</button>
+            </form>
+        </div>
+        
+        <div class="box">
+            <h2 class="section-title">حاسبة التوصيل الذكية</h2>
+            <div class="input-group">
+                <i class="fas fa-map-marker-alt"></i>
+                <select id="calcRegion">
+                    <option value="2000">داخل المدينة (المركز، الجولان، العسكري)</option>
+                    <option value="3000">أطراف المدينة (الشهداء، النعيمية)</option>
+                    <option value="4000">نواحي قريبة (النساف)</option>
+                    <option value="5000">نواحي بعيدة (الصقلاوية، الكرمة)</option>
+                </select>
+            </div>
+            <button class="submit-btn" onclick="alert('كلفة التوصيل التقريبية هي: ' + document.getElementById('calcRegion').value + ' دينار')">احسب الكلفة</button>
+        </div>
+    </div>
+
+    <div id="track" class="page-content">
+        <h2 class="section-title">تتبع طلبك مباشر 📍</h2>
+        <div class="box">
+            <p style="margin-bottom: 15px; font-weight: 600; color: #555;">أدخل رقم الهاتف أو رقم الوصل لتتبع المندوب:</p>
+            <div class="input-group">
+                <i class="fas fa-search"></i>
+                <input type="text" id="trackInput" placeholder="رقم الهاتف (مثال: 0780...)">
+            </div>
+            <button class="submit-btn" onclick="simulateTracking()">ابحث عن الطلب</button>
+            
+            <div id="trackingResult" style="display: none; margin-top: 30px;">
+                <h3 style="text-align: center; color: var(--teal-dark);">طلب رقم #KF-8472</h3>
+                <p style="text-align: center; color: var(--gold); font-weight:bold; margin-bottom: 20px;">المندوب: أحمد علي (دراجة Haojue)</p>
+                
+                <div class="tracking-bar">
+                    <div class="tracking-step completed">
+                        <div class="step-icon"><i class="fas fa-check"></i></div>
+                        <div class="step-text">تم الاستلام</div>
+                    </div>
+                    <div class="tracking-step completed">
+                        <div class="step-icon"><i class="fas fa-fire"></i></div>
+                        <div class="step-text">قيد التجهيز</div>
+                    </div>
+                    <div class="tracking-step completed" style="animation: pulse 1.5s infinite;">
+                        <div class="step-icon"><i class="fas fa-motorcycle"></i></div>
+                        <div class="step-text">بالطريق الك</div>
+                    </div>
+                    <div class="tracking-step">
+                        <div class="step-icon"><i class="fas fa-home"></i></div>
+                        <div class="step-text">تم التسليم</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="merchants" class="page-content">
+        <h2 class="section-title">نظام إدارة المتاجر 🛒</h2>
+        
+        <div class="box" id="loginBox">
+            <p style="margin-bottom: 15px; font-weight: 600;">تسجيل دخول لأصحاب المشاريع (محاكاة):</p>
+            <div class="input-group"><i class="fas fa-user"></i><input type="text" placeholder="اسم المستخدم (اكتب أي شيء)"></div>
+            <button class="submit-btn" onclick="loginMerchant()">دخول للوحة التحكم</button>
+        </div>
+
+        <div class="box" id="dashboardBox" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>أهلاً، مطعم الكرم 🍔</h3>
+                <span style="background:var(--gold); color:var(--teal-dark); padding:5px 10px; border-radius:5px; font-weight:bold;">رصيد الـ COD: 145,000 د.ع</span>
+            </div>
+            
+            <button class="submit-btn" style="background:var(--teal-dark); color:var(--white); margin-bottom: 20px;" onclick="addOrder()">+ إضافة طلبية جديدة للمندوب</button>
+            
+            <div style="overflow-x: auto;">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>رقم الوصل</th>
+                            <th>المنطقة</th>
+                            <th>المبلغ (مع التوصيل)</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <tr>
+                            <td>#991</td><td>حي الشهداء</td><td>28,000 د.ع</td>
+                            <td><span class="status-badge bg-delivering">قيد التوصيل</span></td>
+                        </tr>
+                        <tr>
+                            <td>#992</td><td>السوق العام</td><td>15,000 د.ع</td>
+                            <td><span class="status-badge bg-pending">بانتظار المندوب</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="business" class="page-content">
+        <h2 class="section-title">باقات كفو للأعمال 🤝</h2>
+        <div class="sub-cards">
+            <div class="sub-card">
+                <h3>باقة المتاجر (B2B)</h3>
+                <i class="fas fa-store" style="font-size: 3rem; color: var(--gold-light);"></i>
+                <ul>
+                    <li>تخفيض 25% على سعر التوصيل</li>
+                    <li>تسليم أموال الـ COD خلال 24 ساعة</li>
+                    <li>لوحة تحكم خاصة لطباعة الوصولات</li>
+                    <li>مندوب مخصص وقت الذروة</li>
+                </ul>
+                <button class="submit-btn" style="background: var(--white); margin-top: 10px;" onclick="alert('سيتم تحويلك لواتساب المبيعات')">طلب اشتراك</button>
+            </div>
+            
+            <div class="sub-card">
+                <h3>اشتراك الموظفين</h3>
+                <i class="fas fa-briefcase" style="font-size: 3rem; color: var(--gold-light);"></i>
+                <ul>
+                    <li>توصيل غداء يومي لمقر عملك</li>
+                    <li>دفع شهري أو أسبوعي مقطوع</li>
+                    <li>أولوية قصوى وقت استراحة الدوام</li>
+                </ul>
+                <button class="submit-btn" style="background: var(--white); margin-top: 10px;" onclick="alert('سيتم تحويلك لواتساب المبيعات')">طلب اشتراك</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // نظام التبويبات للتنقل السريع دون تحديث الصفحة
+        function openTab(tabName) {
+            document.querySelectorAll('.page-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        // دالة الطلب السريع (محاكاة للبوت)
+        function sendSmartOrder(event) {
+            event.preventDefault();
+            const item = document.getElementById('orderItem').value;
+            const store = document.getElementById('orderStore').value;
+            const loc = document.getElementById('orderLocation').value;
+            
+            if(item && store && loc) {
+                const msg = `🤖 [طلب آلي عبر النظام]%0Aالطلب: ${item}%0Aمن: ${store}%0Aإلى: ${loc}`;
+                window.open(`https://wa.me/9647800123456?text=${msg}`, '_blank');
+            }
+        }
+
+        // محاكاة التتبع الحي (GPS Simulation)
+        function simulateTracking() {
+            const input = document.getElementById('trackInput').value;
+            if(input.length > 5) {
+                document.getElementById('trackingResult').style.display = 'block';
+            } else {
+                alert("يرجى إدخال رقم هاتف صحيح");
+            }
+        }
+
+        // محاكاة نظام المتاجر (Merchant Dashboard)
+        function loginMerchant() {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('dashboardBox').style.display = 'block';
+        }
+
+        function addOrder() {
+            const table = document.getElementById('ordersTableBody');
+            const id = Math.floor(Math.random() * 900) + 100;
+            const row = `<tr>
+                <td>#${id}</td>
+                <td>الفلوجة (تحديد جديد)</td>
+                <td>-- د.ع</td>
+                <td><span class="status-badge bg-pending">بانتظار المندوب</span></td>
+            </tr>`;
+            table.insertAdjacentHTML('afterbegin', row);
+            alert("تم إضافة الطلب بنجاح، المندوب استلم الإشعار!");
+        }
+    </script>
+</body>
+</html>
